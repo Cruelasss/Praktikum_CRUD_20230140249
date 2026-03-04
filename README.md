@@ -2,7 +2,17 @@ USER API Spesification
 
 *Create User*
 Endpoint :POST /api/users
-<img width="956" height="907" alt="image" src="https://github.com/user-attachments/assets/54e6a6fb-2926-43a7-b166-7aff1b8fdbb6" />
+
+{
+  "name" : "Choirul Amir Siregar",
+  "age" : 23
+}
+
+Response:
+{
+  "name" : "Choirul Amir Siregar",
+  "age" : 23
+}
 
 *Get All users*
 Endpoint :GET /api/users
