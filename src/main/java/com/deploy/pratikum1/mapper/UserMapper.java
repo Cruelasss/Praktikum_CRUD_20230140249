@@ -2,9 +2,12 @@ package com.deploy.pratikum1.mapper;
 
 import com.deploy.pratikum1.model.dto.UserDto;
 import com.deploy.pratikum1.model.entity.User;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapper;
 
+@Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
-    UserDto toUserDtoData (User user);
+
+    UserDto toUserDtoData(User user);
+
+    User toEntity(UserDto userDto);
 }

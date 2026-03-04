@@ -3,7 +3,8 @@ package com.deploy.pratikum1.controller;
 import com.deploy.pratikum1.model.dto.UserAddRequest;
 import com.deploy.pratikum1.model.dto.UserDto;
 import com.deploy.pratikum1.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,77 +14,97 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    // ===============================
+    // CREATE USER
+    // ===============================
     @PostMapping(
-            path = "/api/users",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Map<String, Object>> AddUser(@RequestBody UserAddRequest request) {
+    public ResponseEntity<Map<String, Object>> addUser(
+            @Valid @RequestBody UserAddRequest request
+    ) {
+
         UserDto result = userService.AddUser(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                 "status", "success",
+                "message", "User berhasil ditambahkan",
                 "data", result
         ));
     }
 
-    @GetMapping(
-            path = "/api/users",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    // ===============================
+    // GET ALL USERS
+    // ===============================
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getAllUser() {
+
         List<UserDto> result = userService.getAllUser();
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+        return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "data", result
         ));
     }
 
-    @GetMapping(
-            path = "/api/users/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable("id") String id) {
+    // ===============================
+    // GET USER BY ID
+    // ===============================
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getUserById(
+            @PathVariable String id
+    ) {
+
         UserDto result = userService.getUserById(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+        return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "data", result
         ));
     }
 
+    // ===============================
+    // UPDATE USER
+    // ===============================
     @PutMapping(
-            path = "/api/users/{id}",
+            value = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Map<String, Object>> UpdateUser(
-            @PathVariable("id") String id,
-            @RequestBody UserAddRequest request
+    public ResponseEntity<Map<String, Object>> updateUser(
+            @PathVariable String id,
+            @Valid @RequestBody UserAddRequest request
     ) {
+
         UserDto result = userService.UpdateUser(id, request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+        return ResponseEntity.ok(Map.of(
                 "status", "success",
+                "message", "User berhasil diperbarui",
                 "data", result
         ));
     }
 
-    @DeleteMapping(
-            path = "/api/users/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Map<String, Object>> DeleteUser(@PathVariable("id") String id) {
+    // ===============================
+    // DELETE USER
+    // ===============================
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> deleteUser(
+            @PathVariable String id
+    ) {
+
         userService.DeleteUser(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                "status", "success delete user with id "+ id
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "User berhasil dihapus dengan id " + id
         ));
     }
 }

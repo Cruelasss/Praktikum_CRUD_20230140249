@@ -1,7 +1,5 @@
 package com.deploy.pratikum1.service.lmpl;
 
-
-
 import com.deploy.pratikum1.mapper.UserMapper;
 import com.deploy.pratikum1.model.dto.UserAddRequest;
 import com.deploy.pratikum1.model.dto.UserDto;
@@ -12,9 +10,9 @@ import com.deploy.pratikum1.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,8 +23,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ValidationUtil validationUtil;
 
+    @Autowired
+    private UserMapper userMapper; // ✅ inject mapper
+
     @Override
     public UserDto AddUser(UserAddRequest request) {
+
         validationUtil.validate(request);
 
         User saveUser = User.builder()
@@ -37,53 +39,54 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(saveUser);
 
-        UserDto userDto = UserMapper.MAPPER.toUserDtoData(saveUser);
-
-        return userDto;
+        return userMapper.toUserDtoData(saveUser);
     }
 
     @Override
     public List<UserDto> getAllUser() {
-        List<User> users = userRepository.findAll();
-        List<UserDto> userDto = new ArrayList<>();
-        for (User user : users) {
-            userDto.add(UserMapper.MAPPER.toUserDtoData(user));
-        }
-        return userDto;
+
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toUserDtoData)
+                .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserById(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("user not found"));
-        return UserMapper.MAPPER.toUserDtoData(user);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return userMapper.toUserDtoData(user);
     }
 
     @Override
     public UserDto UpdaetUser(String id, UserAddRequest request) {
-
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("user not found"));
-
-        User user = User.builder()
-                .id(existingUser.getId())
-                .name(request.getName())
-                .age(request.getAge())
-                .build();
-
-        userRepository.save(user);
-
-        return UserMapper.MAPPER.toUserDtoData(user);
-
+        return null;
     }
 
     @Override
     public UserDto UpdateUser(String id, UserAddRequest request) {
-        return null;
-    }
 
+        validationUtil.validate(request);
+
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        existingUser.setName(request.getName());
+        existingUser.setAge(request.getAge());
+
+        userRepository.save(existingUser);
+
+        return userMapper.toUserDtoData(existingUser);
+    }
 
     @Override
     public void DeleteUser(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("user not found"));
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         userRepository.delete(user);
     }
 }
