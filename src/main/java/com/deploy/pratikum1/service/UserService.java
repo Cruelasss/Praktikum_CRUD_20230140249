@@ -10,6 +10,9 @@ public interface UserService {
     List<UserDto> getAllUser ();
     UserDto getUserById(String id);
     UserDto UpdaetUser (String id,  UserAddRequest request);
+
+    UserDto UpdateUser(String id, UserAddRequest request);
+
     void DeleteUser(String id);
 
 }
